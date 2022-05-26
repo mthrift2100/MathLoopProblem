@@ -1,32 +1,43 @@
 ﻿using MathLoopProblem;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 
-bool keepGoing = true;
 
-while (keepGoing)
+CreateLogger();
+
+var host = Host.CreateDefaultBuilder()
+    .ConfigureServices((context, services) =>
+    {
+        services.AddTransient<IMathHelper, MathHelper>();
+        services.AddSingleton((x) => Log.Logger);
+    })
+    .UseSerilog()
+    .Build();
+
+Log.Information("Application Starting ...");
+
+var srv = ActivatorUtilities.CreateInstance<MathHelper>(host.Services);
+srv.Start();
+
+
+
+
+
+
+
+static void CreateLogger()
 {
-    Console.Write("Enter a whole integer value: ");
-    string? response = Console.ReadLine();
+    var builder = new ConfigurationBuilder();
+    builder.SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-    if (string.IsNullOrWhiteSpace(response))
-    {
-        Console.WriteLine("You must provide a valid whole number integer!");
-        continue;
-    }
-          
-    if (long.TryParse(response, out var value))
-    {
 
-        var helper = new MathHelper();
-        Console.WriteLine("Processing ....");
-        Console.WriteLine("");
-        int result = helper.RunEngine(value);
-        Console.WriteLine($"Number {value} took {result} iterations to enter the loop. The highest value reached was: {helper.HighestValue}");
-        Console.WriteLine("");
-    }
-    else
-    {
-        Console.WriteLine("You must provide a valid whole number integer!");
-        continue;
-    }
+    Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Build())
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateLogger();
 }
