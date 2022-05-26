@@ -12,9 +12,12 @@ var host = Host.CreateDefaultBuilder()
     .ConfigureServices((context, services) =>
     {
         services.AddTransient<IMathHelper, MathHelper>();
+        services.AddSingleton((x) => Log.Logger);
     })
     .UseSerilog()
     .Build();
+
+Log.Information("Application Starting ...");
 
 var srv = ActivatorUtilities.CreateInstance<MathHelper>(host.Services);
 srv.Start();

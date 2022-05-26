@@ -1,4 +1,6 @@
-﻿namespace MathLoopProblem;
+﻿using Serilog;
+
+namespace MathLoopProblem;
 
 public interface IMathHelper
 {
@@ -8,9 +10,15 @@ public interface IMathHelper
 
 public class MathHelper : IMathHelper
 {
+    private readonly ILogger _Logger;
     private int iteration = 0;
     private long highestNumber = 0;
 
+
+    public MathHelper(ILogger logger)
+    {
+        _Logger = logger;
+    }
 
     public void Start()
     {
@@ -29,13 +37,15 @@ public class MathHelper : IMathHelper
 
             if (long.TryParse(response, out var value))
             {
-
-                var helper = new MathHelper();
                 Console.WriteLine("Processing ....");
                 Console.WriteLine("");
-                int result = helper.RunEngine(value);
-                Console.WriteLine($"Number {value} took {result} iterations to enter the loop. The highest value reached was: {helper.HighestValue}");
+                DateTime start = DateTime.Now;
+                int result = RunEngine(value);
+                DateTime end = DateTime.Now;
+                TimeSpan runtime = (end - start);
+                Console.WriteLine($"Number {value} took {result} iterations to enter the loop. The highest value reached was: {HighestValue}");
                 Console.WriteLine("");
+                _Logger.Information("Engine took {0} milliseconds to run.", runtime.TotalMilliseconds);
             }
             else
             {
