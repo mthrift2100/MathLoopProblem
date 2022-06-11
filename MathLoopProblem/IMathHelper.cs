@@ -31,12 +31,19 @@ public class MathHelper : IMathHelper
 
             if (string.IsNullOrWhiteSpace(response))
             {
-                Console.WriteLine("You must provide a valid whole number integer!");
+                Console.WriteLine("You must provide a valid positive whole number integer!");
                 continue;
             }
 
             if (long.TryParse(response, out var value))
             {
+                //Ensure value is greater than 0 or else we will end up iin an infinite loop.
+                if (!(value > 0)) 
+                {
+                    Console.WriteLine("You must provide a valid positive whole number integer!");
+                    continue;
+                }
+
                 Console.WriteLine("Processing ....");
                 Console.WriteLine("");
                 DateTime start = DateTime.Now;
@@ -49,7 +56,7 @@ public class MathHelper : IMathHelper
             }
             else
             {
-                Console.WriteLine("You must provide a valid whole number integer!");
+                Console.WriteLine("You must provide a valid positive whole number integer!");
                 continue;
             }
         }
